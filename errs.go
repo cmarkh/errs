@@ -9,6 +9,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/cmarkh/go-mail"
 )
 
 // SetupLog creates a log file and sets up program for logging with my desired parameters
@@ -71,4 +73,19 @@ func ProgramName() (string, error) {
 		return "", err
 	}
 	return filepath.Base(name), nil
+}
+
+// Email sends error in my standard format
+func Email(err error, account mail.Account, to ...string) error {
+	name, e := ProgramName()
+	if e != nil {
+		name = fmt.Sprint("couldn't get program name: ", e)
+	}
+
+	e = account.Send("Program Error - "+name, fmt.Sprintln(err), to...)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return e
 }
