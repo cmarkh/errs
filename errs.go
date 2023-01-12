@@ -78,6 +78,7 @@ func ProgramName() (string, error) {
 }
 
 // Email sends error in my standard format
+// Note must have previously set default email account to send from
 func Email(err error, to ...string) error {
 	name, e := ProgramName()
 	if e != nil {
