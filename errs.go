@@ -93,7 +93,7 @@ func Email(err error, to ...string) error {
 }
 
 // CatchAndRecover catches panics and sends an email
-func CatchAndRecover(account mail.Account) (err error) {
+func CatchAndRecover() (err error) {
 	if r := recover(); r != nil {
 		return Email(errors.New("Panic caught: " + string(debug.Stack()) + "\n\n" + fmt.Sprint(r)))
 	}
