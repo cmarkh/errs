@@ -1,12 +1,14 @@
 package errs
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+	"runtime/debug"
 	"strings"
 	"time"
 
@@ -76,16 +78,24 @@ func ProgramName() (string, error) {
 }
 
 // Email sends error in my standard format
-func Email(err error, account mail.Account, to ...string) error {
+func Email(err error, to ...string) error {
 	name, e := ProgramName()
 	if e != nil {
 		name = fmt.Sprint("couldn't get program name: ", e)
 	}
 
-	e = account.Send("Program Error - "+name, fmt.Sprintln(err), to...)
+	e = mail.Send("Program Error - "+name, fmt.Sprintln(err), to...)
 	if err != nil {
 		log.Println(err)
 	}
 
 	return e
+}
+
+// CatchAndRecover catches panics and sends an email
+func CatchAndRecover(account mail.Account) (err error) {
+	if r := recover(); r != nil {
+		return Email(errors.New("Panic caught: " + string(debug.Stack()) + "\n\n" + fmt.Sprint(r)))
+	}
+	return
 }
